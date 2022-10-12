@@ -1,0 +1,2 @@
+qball
+-DCATKIN_DEVEL_PREFIX=/home/yeison/Qball/devel -DCMAKE_INSTALL_PREFIX=/home/yeison/Qball/install -G Unix Makefiles
