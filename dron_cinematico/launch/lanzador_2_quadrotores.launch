@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Define el nombre del espacio de cada cuadrirrotor-->
+  <arg name="namespace1" default="uav1"/>
+  <arg name="namespace2" default="uav2"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">  <!-- Abre gazebo usando el mundo vacio empty_world.launch -->
+    <arg name="paused" value="true"/>                                 
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+   <group ns="$(arg namespace1)">              
+     <include file="$(find dron_cinematico)/launch/lanzador_secundario.launch"> <!-- Llama otro archivo lanzador con mis parametros -->
+       <arg name="name" value="$(arg namespace1)" /> <!-- Nombre del robot en Gazebo -->
+       <arg name="tf_prefix" value="$(arg namespace1)" />      
+       <arg name="base_link_frame" value="$(arg namespace1)/base_link" /> <!-- base_link_frame es requerido dado que mas de un robot sera usado -->
+       <arg name="model" value="$(find dron_cinematico)/urdf/quadrotor.xacro" />
+       <arg name="x" value="0.0" /> <!-- Posicion inical (x,y,z,yaw) -->
+       <arg name="y" value="-1.0" />
+       <arg name="z" value="0.3" />
+       <arg name="Y" value="0.0" />
+     </include>
+   </group>
+
+  <group ns="$(arg namespace2)">
+     <include file="$(find dron_cinematico)/launch/lanzador_secundario.launch">
+       <arg name="name" value="$(arg namespace2)" />
+       <arg name="tf_prefix" value="$(arg namespace2)" />
+       <arg name="base_link_frame" value="$(arg namespace2)/base_link" />
+       <arg name="model" value="$(find dron_cinematico)/urdf/quadrotor_seguidor.xacro" />
+       <arg name="x" value="0.0" />
+       <arg name="y" value="1.0" />
+       <arg name="z" value="0.3" />
+       <arg name="Y" value="0.0" />
+     </include>
+   </group>
+
+</launch>

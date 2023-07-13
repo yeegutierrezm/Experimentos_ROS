@@ -1,0 +1,250 @@
+<?xml version="1.0"?>
+<robot name="quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="world_frame" default="world"/>
+  <xacro:arg name="base_link_frame" default="base_link"/>
+
+  <xacro:include filename="$(find dron_cinematico)/urdf/my_hector_quadrotor_plugins.xacro" />
+
+  <!-- Quadrotor Gazebo Plugins -->
+  <xacro:quadrotor_sensors />
+  <xacro:quadrotor_controller />
+
+	<!-- Función para definir la inercia -->
+	<xacro:macro name="default_inertial" params="mass">
+  	<inertial>
+    	<mass value="${mass}" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0"
+               iyy="0.01" iyz="0.0"
+               izz="0.01" />
+    </inertial>
+	</xacro:macro>
+
+	<!-- Archivo para colorear el dron -->
+	<xacro:include filename="$(find dron_cinematico)/urdf/quadrotor.gazebo"/>
+	<!-- Los ejes en Gazebo estáb coloreados de la siguiente forma: x:rojo; y:verde z:azul /-->
+
+
+	<!-- Descripción del Robot en formato Xacro -->
+  <link name="$(arg base_link_frame)">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+      	<mesh filename="package://dron_cinematico/meshes/base.stl"/>
+      </geometry>
+    </visual>
+		<xacro:default_inertial mass="1.79"/>
+  </link>
+  
+  
+  <link name="esfera">
+  	<visual>
+    	<origin rpy="0 0 0" xyz="0 0 -0.05"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/esfera.stl"/>
+      </geometry>
+		</visual>
+    <collision>
+			<geometry>
+      	<box size="0.63 0.65 0.6"/>
+			</geometry>
+		</collision>	
+ 	</link>
+  
+  
+  <link name="indicador">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/indicador.stl"/>
+      </geometry>
+		</visual>	
+  </link>
+ 
+ 
+  <link name="sujetador">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/sujetador.stl"/>
+      </geometry>
+    </visual>
+	</link>
+ 
+ 
+  <link name="propelx1">
+  	<visual>
+      <origin rpy="0 0 0" xyz="-0.195 0 -0.07"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/x1.stl"/>
+      </geometry>
+		</visual>
+    <collision>
+			<geometry>
+      	<cylinder length="0.005" radius="0.098"/>
+			</geometry>
+		</collision>	
+	</link>
+   
+   
+  <link name="propelx2">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0.192 0.004 -0.07"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/x2.stl"/>
+      </geometry>
+   	</visual>
+   	<collision>
+	 		<geometry>
+      	<cylinder length="0.005" radius="0.098"/>
+			</geometry>
+		</collision>	
+	</link>
+   
+   
+	<link name="propely1">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 -0.193 -0.07"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/y1.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+			<geometry>
+      	<cylinder length="0.005" radius="0.098"/>
+			</geometry>
+		</collision>	
+   </link>
+ 
+ 
+  <link name="propely2">
+  	<visual>
+      <origin rpy="0 0 0" xyz="-0.003 0.195 -0.07"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/y2.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+			<geometry>
+      	<cylinder length="0.005" radius="0.098"/>
+			</geometry>
+		</collision>	
+   </link>
+   
+ 
+  <link name="tuerca_x1">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/tuerca.stl"/>
+      </geometry>
+    </visual>
+	</link> 
+	
+  <link name="tuerca_x2">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/tuerca.stl"/>
+      </geometry>
+    </visual>
+	</link> 	
+	
+  <link name="tuerca_y1">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/tuerca.stl"/>
+      </geometry>
+    </visual>
+	</link> 		
+ 
+  <link name="tuerca_y2">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/tuerca.stl"/>
+      </geometry>
+    </visual>
+	</link>  
+ 
+ 
+ 
+	<!-- Uniones o Joints-->
+ <joint name="base_a_esfera" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="esfera"/>
+   <origin rpy="0 0 0" xyz="0 0 0.3"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_indicador" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="indicador"/>
+   <origin rpy="0 0 0" xyz="0 0 0.25"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_sujetador" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="sujetador"/>
+   <origin rpy="0 0 0" xyz="0 0 0.25"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_x1" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="propelx1"/>
+   <origin rpy="0 0 0" xyz="0.195 0 0.32"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_x2" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="propelx2"/>
+   <origin rpy="0 0 0" xyz="-0.192 -0.004 0.32"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_y1" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="propely1"/>
+   <origin rpy="0 0 0" xyz="0 0.193  0.32"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_y2" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="propely2"/>
+   <origin rpy="0 0 0" xyz="0.003 -0.195  0.32"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="tuerca_x1_a_base" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="tuerca_x1"/>
+   <origin rpy="0 0 0" xyz="0.195 -0.001 0.325"/>
+   <axis xyz="0 0 1" />
+ </joint> 
+
+ <joint name="tuerca_x2_a_base" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="tuerca_x2"/>
+   <origin rpy="0 0 0" xyz="-0.193 -0.003 0.325"/>
+   <axis xyz="0 0 1" />
+ </joint> 
+ 
+ <joint name="tuerca_y1_a_base" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="tuerca_y1"/>
+   <origin rpy="0 0 0" xyz="0 0.192 0.325"/>
+   <axis xyz="0 0 1" />
+ </joint> 
+
+ <joint name="tuerca_y2_a_base" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="tuerca_y2"/>
+   <origin rpy="0 0 0" xyz="0.002 -0.196 0.325"/>
+   <axis xyz="0 0 1" />
+ </joint>  
+
+</robot>

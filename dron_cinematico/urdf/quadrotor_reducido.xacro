@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+
+<!-- COn este archivo no aparecen las helices porque estan configuradas como continuous, cuando estan cono fixed si aparecen -->
+<robot name="quadrotor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="world_frame" default="world"/>
+  <xacro:arg name="base_link_frame" default="base_link"/>
+
+  <xacro:include filename="$(find dron_cinematico)/urdf/my_hector_quadrotor_plugins.xacro" />
+
+  <!-- Quadrotor Gazebo Plugins -->
+  <xacro:quadrotor_sensors />
+  <xacro:quadrotor_controller />
+
+	<!-- Función para definir la inercia -->
+	<xacro:macro name="default_inertial" params="mass">
+  	<inertial>
+    	<mass value="${mass}" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0"
+               iyy="0.01" iyz="0.0"
+               izz="0.01" />
+    </inertial>
+	</xacro:macro>
+
+	<!-- Archivo para colorear el dron -->
+	<xacro:include filename="$(find dron_cinematico)/urdf/quadrotor.gazebo"/>
+	<!--x:rojo; y:verde z:azul /-->
+
+
+
+
+
+	<!-- Descripción del Robot en formato Xacro -->
+  <link name="$(arg base_link_frame)">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+      	<mesh filename="package://dron_cinematico/meshes/base.stl"/>
+      </geometry>
+      <material name="black">
+				<color rgba="0.09 0.12 0.17 1"/>
+			</material>
+    </visual>
+		<xacro:default_inertial mass="1.79"/>
+  </link>
+  
+  
+  <link name="esfera">
+  	<visual>
+    	<origin rpy="0 0 0" xyz="0 0 -0.05"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/esfera.stl"/>
+      </geometry>
+		</visual>
+    <collision>
+			<geometry>
+      	<box size="0.63 0.65 0.6"/>
+			</geometry>
+		</collision>	
+ 	</link>
+  
+  
+  <link name="indicador">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/indicador.stl"/>
+      </geometry>
+		</visual>	
+  </link>
+ 
+ 
+  <link name="sujetador">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/sujetador.stl"/>
+      </geometry>
+    </visual>
+	</link>
+ 
+ 
+	<!-- Uniones o Joints-->
+ <joint name="base_a_esfera" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="esfera"/>
+   <origin rpy="0 0 0" xyz="0 0 0.3"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_indicador" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="indicador"/>
+   <origin rpy="0 0 0" xyz="0 0 0.25"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+ <joint name="base_a_sujetador" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="sujetador"/>
+   <origin rpy="0 0 0" xyz="0 0 0.25"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+
+
+<!-- Función para crear los propopeles-->
+<xacro:macro name="propel" params="n x y z xj yj zj">
+
+  <link name="propel${n}">
+  	<visual>
+      <origin rpy="0 0 0" xyz="${x} ${y} ${z}"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/${n}.stl"/>
+      </geometry>
+    </visual>
+    <collision>
+			<geometry>
+      	<cylinder length="0.005" radius="0.098"/>
+			</geometry>
+		</collision>	
+	</link>
+   
+ <joint name="base_a_${n}" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="propel${n}"/>
+   <origin rpy="0 0 0" xyz="${xj} ${yj} ${zj}"/>
+   <axis xyz="0 0 1" />
+ </joint>
+ 
+</xacro:macro>
+
+<!--se llama la funcion -->
+<xacro:propel n="x1" x="-0.195"  y="0"      z="-0.07"		xj="0.195"		yj="0"			  zj="0.32"/>
+<xacro:propel n="x2" x="0.192"   y="0.004"  z="-0.07"		xj="-0.192"		yj="-0.004"		zj="0.32"/>
+<xacro:propel n="y1" x="0"       y="-0.193" z="-0.07"		xj="0"			  yj="0.193"		zj="0.32"/>
+<xacro:propel n="y2" x="-0.003"  y="0.195"  z="-0.07"		xj="0.003"		yj="-0.195"		zj="0.32"/>
+
+
+
+<!-- Función para crear las tuercas-->
+<xacro:macro name="tuerca" params="n xj yj zj">
+
+  <link name="tuerca_${n}">
+  	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://dron_cinematico/meshes/tuerca.stl"/>
+      </geometry>
+    </visual>
+	</link> 
+
+ <joint name="tuerca_${n}_a_base" type="fixed">
+   <parent link="$(arg base_link_frame)"/>
+   <child link="tuerca_${n}"/>
+   <origin rpy="0 0 0" xyz="${xj} ${yj} ${zj}"/>
+   <axis xyz="0 0 1" />
+ </joint>
+
+</xacro:macro>
+
+<!--se llama la funcion -->
+<xacro:tuerca n="x1" xj="0.195"    yj="-0.001"  zj="0.325"/>
+<xacro:tuerca n="x2" xj="-0.193"   yj="-0.003"  zj="0.325"/>
+<xacro:tuerca n="y1" xj="0"        yj="0.192"   zj="0.325"/>
+<xacro:tuerca n="y2" xj="0.002"    yj="-0.196"  zj="0.325"/>
+
+</robot>

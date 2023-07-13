@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- este archivo sirve para poner colores a los diferentes materiales de las partes del dron y que se pueda ver en gazebo-->
+<robot>
+
+	<gazebo reference="base_link">
+		<material>Gazebo/FlatBlack</material>
+	</gazebo>
+	
+	<gazebo reference="esfera">
+		<material>Gazebo/FlatBlack</material>
+	</gazebo>
+	
+	<gazebo reference="indicador">
+		<material>Gazebo/RedGlow</material>
+	</gazebo>
+	
+	<gazebo reference="sujetador">
+		<material>Gazebo/Red</material>
+	</gazebo>
+	
+	<gazebo reference="propelx1">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<gazebo reference="propelx2">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<gazebo reference="propely1">
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<gazebo reference="propely2">
+		<material>Gazebo/White</material>
+	</gazebo>
+
+</robot>

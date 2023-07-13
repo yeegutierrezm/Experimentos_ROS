@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>dron_cinematico</name>
+  <version>0.1.0</version>
+  <description>The dron_cinematico package</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <!-- Example:  -->
+  <maintainer email="cmauricioae8@gmail.com">mau</maintainer> <!-- From "Robotica Posgrado" (youtube channel) -->
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>Apache 2.0</license>
+
+
+  <!--build_depend>message_generation</build_depend-->
+  <!--exec_depend>message_runtime</exec_depend-->
+
+  <buildtool_depend>catkin</buildtool_depend> 
+  <build_export_depend>gazebo_ros</build_export_depend>	<!-- Necesaria para ejecutar Gazebo --> 
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>visualization_msgs</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  
+  <build_depend>rospy</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>gazebo_dev</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+    <gazebo_ros gazebo_media_path="${prefix}/models"/>
+    <gazebo_ros plugin_path="$(prefix)/lib"/>
+  </export>
+  
+</package>

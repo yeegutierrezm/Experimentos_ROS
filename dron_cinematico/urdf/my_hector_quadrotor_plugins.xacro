@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- Este archivo importa las librerias de la IMU, Ros Control, ROSp3d -->
+  
+  <!-- Quadrotor Sensor Plugins -->
+  <xacro:macro name="quadrotor_sensors">
+        <gazebo>
+          <plugin name="quadrotor_imu_sim" filename="libhector_gazebo_ros_imu.so">
+            <updateRate>100.0</updateRate>
+            <bodyName>$(arg base_link_frame)</bodyName>
+            <frameId>$(arg base_link_frame)</frameId>
+            <topicName>raw_imu</topicName>
+            <rpyOffset>0 0 0</rpyOffset> <!-- deprecated -->
+            <gaussianNoise>0</gaussianNoise>  <!-- deprecated -->
+            <accelDrift>0.1 0.1 0.1</accelDrift>
+            <accelGaussianNoise>0.35 0.35 0.3</accelGaussianNoise>
+            <rateDrift>0.1 0.1 0.1</rateDrift>
+            <rateGaussianNoise>0.05 0.05 0.015</rateGaussianNoise>
+          </plugin>
+
+<!-- Publica la posicion de un cuerpo a travex del mensaje odometry-->
+          <plugin name="quadrotor_groundtruth_sim" filename="libgazebo_ros_p3d.so">
+            <updateRate>100.0</updateRate>
+            <bodyName>$(arg base_link_frame)</bodyName>
+            <topicName>ground_truth/state</topicName>
+            <gaussianNoise>0.0</gaussianNoise>
+            <frameName>$(arg world_frame)</frameName>
+          </plugin>
+        </gazebo>
+  </xacro:macro>
+
+  <!-- Quadrotor Controller -->
+  <xacro:macro name="quadrotor_controller">
+    <gazebo>
+      <plugin name="quadrotor_controller" filename="libgazebo_ros_control.so">
+        <controlPeriod>0.01</controlPeriod>
+        <robotSimType>hector_quadrotor_controller_gazebo/QuadrotorHardwareSim</robotSimType>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+</robot>
+

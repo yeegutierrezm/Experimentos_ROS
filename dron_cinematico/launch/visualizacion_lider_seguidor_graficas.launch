@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- visualizacacion del dron y de las trayectorias en Rviz  -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find dron_cinematico)/rviz/config_lider_seguidor.rviz"/>
+</launch>

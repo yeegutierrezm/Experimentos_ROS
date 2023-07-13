@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">  <!-- Abrir gazebo usando el mundo vacio, empty_world.launch -->
+    <arg name="paused" value="true"/> <!--Simulacion inicia pausada en true-->
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!--Para importar el dron en gazebo -->
+  <include file="$(find dron_cinematico)/launch/lanzador_secundario.launch"> <!-- Llamar otro archivo lanzador con mis parametros-->
+    <arg name="name" value="quadrotor" /> <!-- Nombre del robot en gazebo -->
+    <arg name="tf_prefix" value="" />
+    <arg name="model" value="$(find dron_cinematico)/urdf/quadrotor_reducido.xacro" />
+    <arg name="x" value="0.0" /> <!-- Posicion inicial en (x,y,z,yaw (Psi)) -->
+    <arg name="y" value="-1.0" />
+    <arg name="z" value="0.3" />
+    <arg name="Y" value="0.0" />
+  </include>
+
+  <arg name="world_frame" default="world"/>
+  <!-- Publicar estado y tf (marcos de referecia) -->
+  <node name="ground_truth_to_tf" pkg="message_to_tf" type="message_to_tf" output="screen"> <!--Conversion del amrco de referencia del robot al marco de referncia global-->
+    <param name="odometry_topic" value="ground_truth/state" />
+    <param name="frame_id" value="$(arg world_frame)" />
+    <param name="tf_prefix" value=""/>
+  </node>
+
+</launch>
