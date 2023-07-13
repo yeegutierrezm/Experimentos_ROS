@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<launch>
+  <rosparam file="$(find robot1_description)/config/robot1_gazebo_control_Position.yaml" command="load"/>
+  <!-- these are the arguments you can pass this launch file, for example paused:=true -->
+  <arg name="model" default="$(find robot1_description)/urdf/robot1_reduced.xacro"/>
+  <arg name="paused" default="true"/>
+  <arg name="use_sim_time" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="true"/>
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+   <include file="$(find gazebo_ros)/launch/empty_world.launch"> 
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/> 
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+
+  <!-- Load the URDF into the ROS Parameter Server -->
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+   
+   <!-- Publicador del estado de los controladores-->
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+   
+   <!-- Cargar los controladores -->
+   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+   output="screen" ns="/robot1" args="joint_state_controller
+   					joint1_position_controller
+   					joint3_position_controller
+   					joint4_position_controller
+   					joint5_position_controller" />  
+
+  <node pkg="robot1_description" type="Mover_Articulacion.py" name="publicador1"/>  
+  
+  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+	args="-urdf -model robot1 -param robot_description -z 0.05"/>  
+
+</launch>

@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      
+	   name="robot1_xacro">
+	   
+
+	<!--constantes -->
+	<xacro:property name="length_wheel" value="0.05" />
+	<xacro:property name="radius_wheel" value="0.05" />
+	<xacro:property name="camera_link" value="0.05" />
+	
+	
+	<!--funcion de inercia constante -->
+	<xacro:macro name="default_inertial" params="mass">
+    	<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                               iyy="1.0" iyz="0.0"
+                               izz="1.0" />  
+    	</inertial>
+	</xacro:macro>
+	
+	<!-- Funcion de transmision para poder implementar controlador-->
+	<xacro:macro name="transmission_block" params="joint_name">
+		<transmission name="tran1">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="${joint_name}">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor1">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+	  	</transmission>
+	</xacro:macro>
+
+	<!--Base para sensor hokuyo -->
+	<link name="base_footprint">
+   		<visual>
+			<geometry>
+      			<box size="0.001 0.001 0.001"/>
+     		</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="white">
+				<color rgba="1 1 1 1"/>
+			</material>
+   		</visual>
+		 <!--<xacro:default_inertial mass="0.0001"/>     Esta línea genera un Warning  -->
+ 	</link>
+ 
+	
+	<joint name="base_footprint_joint" type="fixed">
+		<origin xyz="0 0 0"/>
+		<parent link="base_footprint"/>
+		<child link="base_link"/>
+	</joint>
+	
+    
+    
+    
+    
+    
+    <!-- ************* DESCRIPCIÓN ROBOT ************** -->
+    
+	<!--eslabon base (padre) -->
+	<link name="base_link">
+   		<visual>
+			<geometry>
+      			<box size="0.2 .3 .1"/>
+     		</geometry>
+			<origin rpy="0 0 1.54" xyz="0 0 0.05"/>
+			<material name="white">
+				<color rgba="1 1 1 1"/>
+			</material>
+   		</visual>
+		<collision>
+			<geometry>
+       			<box size="0.2 .3 0.1"/>
+			</geometry>
+		</collision>
+		<xacro:default_inertial mass="70"/>
+ 	</link>
+
+
+	<!--funcion ruedas -->
+	<xacro:macro name="wheel" params="n x y z">
+ 	<link name="wheel_${n}">
+   		<visual>
+     		<geometry>
+       			<cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+     		</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+   			<material name="black">
+				<color rgba="0 0 0 1"/>
+			</material>
+		</visual>
+		<collision>
+			<geometry>
+       			<cylinder length="${length_wheel}" radius="${radius_wheel}"/>
+			</geometry>
+		</collision>
+		<xacro:default_inertial mass="5"/>
+ 	</link>
+
+	 <joint name="base_to_wheel${n}" type="continuous">
+	   <parent link="base_link"/>
+	   <child link="wheel_${n}"/>
+	   <origin rpy="${pi/2} 0 0" xyz="${x} ${y} ${z}"/>
+	   <axis xyz="0 0 1" />
+	 </joint>
+	</xacro:macro>
+	
+	<!--se llama la funcion -->
+	<xacro:wheel n="1" x="0.1" y="0.15" z="0"/>
+	<xacro:wheel n="2" x="-0.1" y="0.15" z="0"/>
+	<xacro:wheel n="3" x="0.1" y="-0.15" z="0"/>
+	<xacro:wheel n="4" x="-0.1" y="-0.15" z="0"/>
+
+	
+	<!--codigo para llamar el archivo .gazebo que cambia el color y configura sensores etc -->
+	<xacro:include filename="$(find robot1_description)/urdf/robot.gazebo"/>
+	
+
+
+	<!--creo la base del brazo -->
+	<link name="arm_base">
+   		<visual>
+     		<geometry>
+       			<box size="0.1 .1 .1"/>
+     		</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0.1"/>
+			<material name="black">
+				<color rgba="0 0 0 1"/>
+			</material>
+   		</visual>
+		<collision>
+			<geometry>
+       			<box size="0.1 .1 .1"/>
+			</geometry>
+		</collision>
+		<xacro:default_inertial mass="50"/>
+ 	</link>
+ 	
+ 	<!-- juntura brazo a base-->
+	<joint name="base_to_arm_base" type="continuous">
+		<parent link="base_link"/>
+		<child link="arm_base"/>
+		<axis xyz="0 0 1"/>
+		<origin xyz="0 0 0"/>
+	</joint>
+
+	
+	<!-- funcion para eslabones  1 y 2 -->
+	<xacro:macro name="arm" params="n x y z">
+	<link name="arm_${n}">
+   		<visual>
+     		<geometry>
+       			<box size="0.05 .05 0.5"/>
+     		</geometry>
+			<origin rpy="0 0 0" xyz="${x} ${y} ${z}"/>
+			<material name="white">
+				<color rgba="1 1 1 1"/>
+			</material>
+   		</visual>
+		<collision>
+			<geometry>
+       			<box size="0.05 .05 0.5"/>
+			</geometry>
+		</collision>
+		<xacro:default_inertial mass="2"/>
+ 	</link>
+ 	</xacro:macro>
+ 	
+ 	<xacro:arm n="1" x="0" y="0" z="0.25"/>
+ 	<xacro:arm n="2" x="0.06" y="0" z="0.15"/>
+
+
+		
+	<!-- union brazo a base-->
+	<joint name="arm_1_to_arm_base" type="fixed">
+		<parent link="arm_base"/>
+		<child link="arm_1"/>
+		<axis xyz="1 0 0"/>
+		<origin xyz="0 0 0.15"/>
+		<limit effort ="1000.0" lower="-1.0" upper="1.0" velocity="0.5"/>
+	</joint>
+
+
+	<!-- union eslabon 1 a eslabon 2 -->
+	<joint name="arm_2_to_arm_1" type="revolute">
+		<parent link="arm_1"/>
+		<child link="arm_2"/>
+		<axis xyz="1 0 0"/>
+		<origin xyz="0.0 0 0.45"/>
+		<limit effort ="1000.0" lower="-2.5" upper="2.5" velocity="0.5"/>
+	</joint>
+
+
+	<!-- funcion para union sujetadores -->
+	<xacro:macro name="gripper_joint" params="lr x y z">
+	  <joint name="${lr}_gripper_joint" type="revolute">
+	    <axis xyz="${x} ${y} ${z}"/>
+	    <limit effort="1000.0" lower="0.0" upper="0.548" velocity="0.5"/>
+	    <origin rpy="0 -1.57 0" xyz="0.06 0 0.4"/>
+	    <parent link="arm_2"/>
+	    <child link="${lr}_gripper"/>
+	  </joint>
+	</xacro:macro>
+
+	<xacro:gripper_joint lr="left" x="0" y="0" z="1"/>
+	<xacro:gripper_joint lr="right" x="0" y="0" z="-1"/>
+
+  
+  	<!-- funcion para sujetadores -->
+	<xacro:macro name="lr_gripper" params="lr r p y">
+	  <link name="${lr}_gripper">
+	    <visual>
+	      <origin rpy="${r} ${p} ${y}" xyz="0 0 0"/>
+	      <geometry>
+		<mesh filename="package://pr2_description/meshes/gripper_v0/l_finger.dae"/>
+	      </geometry>
+	    </visual>
+		<collision>
+			<geometry>
+	       		<box size="0.1 .1 .1"/>
+			</geometry>
+		</collision>
+		<xacro:default_inertial mass="0.1"/>
+	  </link>
+	  </xacro:macro>
+	  
+	  <xacro:lr_gripper lr="left" r="0" p="0" y="0"/>
+	  <xacro:lr_gripper lr="right" r="-3.1415" p="0" y="0"/>
+  
+
+	<!-- Funcion union para punta sujetadores-->
+	<xacro:macro name="lr_tip_joint" params="lr" >
+	  <joint name="${lr}_tip_joint" type="fixed">
+	    <parent link="${lr}_gripper"/>
+	    <child link="${lr}_tip"/>
+	  </joint>  
+	  </xacro:macro>
+	  
+	  <xacro:lr_tip_joint lr="left"/>
+	  <xacro:lr_tip_joint lr="right"/>
+	
+	
+	<!-- funcion para punta sujetador-->	 
+	  <xacro:macro name="lr_tip" params="lr r p y x yy z sx sy sz">
+		<link name="${lr}_tip">
+	    <visual>
+	      <origin rpy="${r} ${p} ${y}" xyz="${x} ${yy} ${z}"/>
+	      <geometry>
+		<mesh filename="package://pr2_description/meshes/gripper_v0/l_finger_tip.dae"/>
+	      </geometry>
+	    </visual>
+		<collision>
+			<geometry>
+	       		<box size="${sx} ${sy} ${sz}"/>
+			</geometry>
+		</collision>
+		<xacro:default_inertial mass="1"/>
+	  </link>
+	  </xacro:macro> 
+	  
+	  <xacro:lr_tip lr="left" r="0" p="0" y="0" x="0.09137 " yy="0.00495" z="0" sx="0.1" sy="0.1" sz="0.1"/>  
+	  <xacro:lr_tip lr="right" r="-3.1415" p="0" y="0" x="0.09137 " yy="0.00495" z="0" sx="0.2" sy="0.2" sz="0.2"/>  
+	  
+	  
+	  
+	  <!-- SENSORES -->
+	   <!-- Camera joint-->
+	  <joint name="camera_joint" type="fixed">
+		<axis xyz="0 1 0" />
+		<origin xyz="0.125 0 0.125" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="camera_link"/>
+	  </joint>
+
+	  <!-- Camera -->
+	  <link name="camera_link">
+		<collision>
+		  <origin xyz="0 0 0" rpy="0 0 0"/>
+		  <geometry>
+		<box size="${camera_link} ${camera_link} ${camera_link}"/>
+		  </geometry>
+		</collision>
+
+		<visual>
+		  <origin xyz="0 0 0" rpy="0 0 0"/>
+		  <geometry>
+		<box size="${camera_link} ${camera_link} ${camera_link}"/>
+		  </geometry>
+		  <material name="red">
+		  	<color rgba="1 0 0 1"/>
+		  </material>
+		</visual>
+
+		<inertial>
+		  <mass value="1e-5" />
+		  <origin xyz="0 0 0" rpy="0 0 0"/>
+		  <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+		</inertial>
+	  </link>
+		  
+		<!-- Hokuyo-->  
+	  <link name="hokuyo_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.1 0.1 0.1"/>
+        </geometry>
+      </collision>
+      
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+        	<!--mesh filename="package://turtlebot_description/meshes/sensors/hokuyo.dae"/-->
+          <mesh filename="package://robot1_description/meshes/hokuyo.dae"/>
+        </geometry>
+      </visual>
+      
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+    
+    <joint name="hokuyo_joint" type="fixed">
+      <axis xyz="0 1 0" />
+      <origin xyz="0.125 0.05 0.125" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="hokuyo_link"/>
+     </joint>	  
+     
+     <gazebo>  
+  <!-- Driver controlador-->
+  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+    <updateRate>100.0</updateRate>
+    <robotNamespace>/</robotNamespace>
+    <leftFrontJoint>base_to_wheel1</leftFrontJoint>
+    <rightFrontJoint>base_to_wheel2</rightFrontJoint>
+    <leftRearJoint>base_to_wheel3</leftRearJoint>
+    <rightRearJoint>base_to_wheel4</rightRearJoint>
+    <wheelSeparation>0.4</wheelSeparation>
+    <wheelDiameter>0.1</wheelDiameter>
+    <robotBaseFrame>base_link</robotBaseFrame>
+    <torque>1</torque>
+    <topicName>cmd_vel</topicName>
+    <broadcastTF>false</broadcastTF>
+  </plugin>
+</gazebo>
+
+ <xacro:transmission_block joint_name="base_to_arm_base"/>
+ <xacro:transmission_block joint_name="arm_2_to_arm_1"/>
+ <xacro:transmission_block joint_name="left_gripper_joint"/>
+ <xacro:transmission_block joint_name="right_gripper_joint"/>
+	
+</robot>
